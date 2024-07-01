@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> -->
+    <link rel="stylesheet"  href="{% static 'main.css' %}">
+</head>
+
+<body>
+    <header class="site-header">
+        <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+          <div class="container">
+              <!-- Navbar Right Side -->
+              <div class="header">
+                <!-- <a class="home" href="{% url 'home' %}">Home</a> -->
+                {% if user.is_authenticated %}
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <!-- <button type="submit" class="logout">Logout</button> -->
+                </form>
+                {% else %}
+                  <a class="" href="{% url 'login' %}">Login</a>
+                  <a class="" href="{% url 'signup' %}">Register</a>
+                {% endif %}
+              </div> 
+          </div>
+        </nav>
+      </header>
+    {% block content %}
+    {% endblock %}
+</body>
+</html>
