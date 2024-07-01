@@ -1,0 +1,153 @@
+#include <stdio.h>
+
+int add(){int i,j,c,r;
+	printf("Enter no of rows:");
+	scanf("%d",&r);
+	printf("Enter no of columns:");
+	scanf("%d",&c);
+	int a[r][c];
+	for (i=0;i<r;i++){
+			for (j=0;j<c;j++){
+				printf("Enter element of %d th row and %d th column",i+1,j+1);
+				scanf("%d",&a[i][j]);
+				
+				
+				
+		}}
+		int b[r][c];
+	for (i=0;i<r;i++){
+	for (j=0;j<c;j++){
+				printf("Enter element of %d th row and %d th column",i,j);
+				scanf("%d",&b[i][j]);
+				
+				
+				
+		}}
+int sum[r][c];
+for(i=0;i<r;i++)
+{
+	for(j=0;j<c;j++)
+		{
+			sum[i][j]=a[i][j]+b[i][j];
+			printf("%d ",sum[i][j]);
+		}
+	printf("\n");
+}
+		
+		
+		
+	return 0;}
+
+int product(){
+	int i,j,c1,r1,r2,c2,k;
+	printf("Enter no of rows:");
+	scanf("%d",&r1);
+	printf("Enter no of columns:");
+	scanf("%d",&c1);
+	int a[r1][c1];
+	for (i=0;i<r1;i++){
+			for (j=0;j<c1;j++){
+				printf("Enter element of %d th row and %d th column",i+1,j+1);
+				scanf("%d",&a[i][j]);
+				
+				
+				
+		}}
+printf("Enter no of rows:");
+scanf("%d",&r2);
+if (r2==c1){
+	printf("Enter no of columns: ");
+	scanf("%d",&c2);
+	
+	int b[r2][c2];
+	for (i=0;i<r2;i++){
+	for (j=0;j<c2;j++){
+				printf("Enter element of %d th row and %d th column:",i+1,j+1);
+				scanf("%d",&b[i][j]);
+				
+				
+				
+		}}
+int prod[r1][c2];
+	for(i=0;i<r1;i++)    
+{    
+for(j=0;j<c2;j++)    
+{    
+prod[i][j]=0;   
+for(k=0;k<c1;k++)    
+{    
+prod[i][j]+=a[i][k]*b[k][j];    
+} 
+//printf("%d\t", product[i][j]);   
+}
+//printf("\n");    
+}    
+for(i=0;i<r1;i++)    
+{    
+for(j=0;j<c2;j++)    
+{    
+printf("%d\t", prod[i][j]);    
+}    
+printf("\n");    
+}    
+
+		
+	
+	
+	
+	
+	
+	
+	}
+else printf("Matrix multiplication not possible");
+		
+
+
+
+
+
+
+
+
+
+
+	return 0;}
+
+
+
+
+
+
+
+
+
+int main()
+{
+    char choice;
+
+    printf("\n enter a to matrix addition");
+    printf("\n enter m to matrix multiplication");
+    printf("\n enter t to transpose");
+ 
+    printf("\n enter the choice(a,m,t):");
+    scanf("%c",&choice);
+   
+    switch (choice)
+    {
+        case 'a':
+       add();
+        break;
+        case 'm':
+        product();
+
+        break;
+        case 't':
+ 
+        break;
+        default:
+        printf("wrong input");
+        break;
+    }
+
+    return 0;
+}

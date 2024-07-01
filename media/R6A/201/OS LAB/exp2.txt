@@ -1,0 +1,17 @@
+
+#include <stdio.h>
+float fact(float);
+int main()
+{
+float ans,n;
+printf("Please enter number to find factorial of:");
+scanf("%f",&n);
+ans = fact(n);
+printf("Answer is %f",ans);
+}
+float fact(float n){
+		if (n==1)
+			return 1;
+		else
+			return (n*fact(n-1)); 
+	}

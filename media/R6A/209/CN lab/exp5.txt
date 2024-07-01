@@ -1,0 +1,22 @@
+#include <stdio.h>
+int main(){
+int sum2=0;
+int c4=0;
+int c2=0;
+int c3=0;
+int c5=0;
+int c6=0;
+int c7=0;
+int c8=0;
+int k,j;
+int n;
+scanf("%d",&n);
+for(k=1,c2++ ;k<=n;k=k*2,c3++)
+{
+	c4++;
+	for(j=1,c5++;j<=k;j++,c7++)
+		{sum2++;
+		c8++;}
+}
+printf("%d %d %d %d %d %d %d ",c2,c3,c4,c5,c6,c7,c8);
+}

@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+struct node {
+    char name[50];
+    struct node* child;
+    struct node* next;
+};
+struct node*  createNode(char name[]){
+    struct node* root = malloc(sizeof(struct node));
+    root->child = root->next = NULL;
+    strcpy(root->name,name);
+    return(root);
+}
+void addChild(struct node* parent, struct node* child){
+    if(parent->child == NULL) 
+        parent->child = child;
+    else{
+        struct node* curr = parent->child;
+        while(curr->next != NULL) curr = curr->next;
+        curr->next = child;
+    }
+}
+void printDirectory(struct node* root, int depth) {
+    if (root == NULL) return;
+    for (int i = 0; i < depth; i++) {
+        printf("     ");
+    }
+    printf(" |_____%s\n", root->name);
+    struct node* current = root->child;
+    while (current != NULL) {
+        printDirectory(current, depth + 1);
+        current = current->next;
+    }
+}
+int main(){
+    char name[20], choice[10], x;
+    strcpy(name,"-Gtech-Mulearn");
+    struct node* root = createNode(name);
+    strcpy(name,"Neha-K");
+    struct node* user = createNode(name);
+    addChild(root,user);
+    strcpy(name,"SCTCE");
+    struct node* ptr = createNode(name);
+    addChild(user,ptr);
+    strcpy(name,"Kerala");
+    struct node* ptr2 = createNode(name);
+    addChild(ptr, ptr2);
+    strcpy(name,"Trivandrum");
+    ptr2 = createNode(name);
+    addChild(ptr, ptr2);
+    printf("     %s\n", root->name);
+    printDirectory(user,1);
+    return(0);
+}

@@ -1,0 +1,52 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct file
+{
+    char name[20];
+    int nob;
+    struct block *sb;
+}f[30];
+struct block
+{
+    int bno;
+    struct block *next;
+};
+int main()
+{
+    int i,j,n;
+    struct block *temp;
+    printf("Enter number of files :");
+    scanf("%d",&n);
+    for(i=0;i<n;i++)
+    {
+        printf("Enter name of file %d:",i+1);
+        scanf("%s",f[i].name);
+        printf("Enter number of blocks :");
+        scanf("%d",&f[i].nob);
+        f[i].sb=(struct block*)malloc(sizeof(struct block));
+        temp=f[i].sb;
+        printf("Enter blocks :");
+        scanf("%d",&temp->bno);
+        temp->next=NULL;
+        for(j=1;j<f[i].nob;j++)
+        {
+            temp->next=(struct block*)malloc(sizeof(struct block));
+            temp=temp->next;
+            scanf("%d",&temp->bno);
+        }
+        temp->next=NULL;
+    }
+    printf("Allocated files are\n");
+    for(i=0;i<n;i++)
+    {
+        printf("\nFile name : %s",f[i].name);
+        struct block *temp1;
+        temp1=f[i].sb;
+        printf("\nAllocated blocks are :");
+        for(j=0;j<f[i].nob;j++)
+        {
+            printf("%d->",temp1->bno);
+            temp1=temp1->next;
+        }
+    }
+}
