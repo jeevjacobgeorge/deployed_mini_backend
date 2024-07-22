@@ -5,6 +5,9 @@ from django.contrib.auth.decorators import login_required
 from studapi.models import Lab,File,Student,Experiment
 from django.http import JsonResponse
 import json
+import os
+
+# Create your views here.
 
 
 def register(request):
@@ -20,7 +23,7 @@ def register(request):
     return render(request, 'users/signup.html', {'form': form})
 
 @login_required
-def home1(request):
+def home(request):
     batches = Lab.objects.values_list('batch', flat=True).distinct()
     if request.method == 'POST':
         batch = request.POST.get('batch')
@@ -50,16 +53,17 @@ def home1(request):
                 
         roll_list = json.dumps(list(data_dict.keys()))
         experiments_json = json.dumps(list(data_dict.values())) if data_dict else '[]'
-        return render(request, 'users/home.html', {'experiments_json': experiments_json, 'batches': batches,'exp_names_list':exp_name_list, 'roll_list': roll_list})
+        return render(request, 'users/home.html', {'experiments_json': experiments_json,
+                                                   'batches': batches,'exp_names_list':exp_name_list,
+                                                   'roll_list': roll_list,
+                                                   'selected_batch': batch,
+                                                   'selected_lab': lab,
+                                })
+    else:
+        return render(request, 'users/home.html', {'batches': batches})
     
 
-@login_required
-def home(request):
-    batches = Lab.objects.values_list('batch', flat=True).distinct()
-    if request.method == 'GET':
-        return render(request, 'users/home.html', {'batches': batches})
-    else:
-        return JsonResponse({'error': 'Invalid request'}, status=400)
+
 
 def labs(request):
     if request.method == 'GET':
@@ -70,6 +74,7 @@ def labs(request):
 
 
 def mark_files_as_printed(request):
+    print('da')
     if request.method == 'POST':
         data = json.loads(request.body)
         file_ids = data.get('file_ids')
@@ -85,3 +90,26 @@ def mark_files_as_printed(request):
             return JsonResponse({'success': False, 'error': 'No file_ids provided in the POST data'})
 
         
+
+def delete_printed_files(request):
+    
+    if request.method == 'POST':
+        try: 
+            # Fetch files marked as printed
+            printed_files = File.objects.filter(printed=True)
+            # Delete physical files
+            # print(printed_files)
+            for file_instance in printed_files:
+                print(file_instance.file.path)
+                if os.path.exists(file_instance.file.path):
+                    os.remove(file_instance.file.path)
+                    print(file_instance.file.path,"File deleted\n")
+                    
+            # Delete entries from database
+            printed_files.delete()
+            
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method. Only POST requests are allowed.'})

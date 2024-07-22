@@ -7,7 +7,7 @@
         <div class="main">
             
             <img src="{% static 'logouticon.svg' %}" alt="" id="logoutBtn" class="logout">
-            <form id="myForm" action="/users/home1" method="post">
+            <form id="myForm" action="/users/home" method="post">
                 {% csrf_token %}
                 <div class="options">
                     <!-- <label for="Class">Class</label> -->
@@ -22,10 +22,17 @@
                         <option value="" disabled selected >Select Lab</option>
                     </select>
                     <button type="submit" class="submitbtn">Submit</button>
+
+
                 </div>
             </form>
+
             {% if experiments_json %}
             <table id="printTable">
+                <div style="display: flex;flex-direction: row;align-items: center;justify-content:center;gap:42px; ">
+                    <h2 style="margin:0;">{{selected_batch}}</h2>
+                    <h2 style="margin:0;">{{selected_lab}}</h2>
+                </div>
                 <thead class="table_header">
                     <tr>
                         <th>Roll No</th>
@@ -41,7 +48,10 @@
             </table>
             {% endif %}
         </div>
+        <button id="delete-printed-files-button" class="submitbtn" style="background-color: rgb(144, 81, 32);" onclick=deletePrintedFiles()>Delete All Printed Files</button>
+
     </div>
+
         <script>
             // JavaScript
             document.getElementById("logoutBtn").addEventListener("click", function() {
@@ -73,9 +83,10 @@
                             }
                             console.log('Files marked as printed successfully');
                         })
+                        .then(window.location.reload())
                         .catch(error => {
                             console.error('Error marking files as printed:', error);
-                        });
+                        })
                 }
 
         // Function to retrieve the CSRF token from cookies
@@ -136,7 +147,7 @@
                                 }
                                 else if (experiments[i][key][0]){
                                     // uploaded to print
-                                    const url = "https://miniprojectprintmanagement.pythonanywhere.com/" + `${experiments[i][key][1]}`;
+                                    const url = "http://127.0.0.1:8000/" + `${experiments[i][key][1]}`;
                                     const id = `${experiments[i][key][3]}`
                                     td1.innerHTML = `<button class = "printbtn" onclick=print('${url}','${id}') >Print</button>`;
                                 }
@@ -170,18 +181,24 @@
                         printWindow.document.write('<pre>' + fileContent + '</pre>');
                         printWindow.document.close();
                         printWindow.print();
+                        var printCheckInterval = setInterval(function() {
+                            if (printWindow.closed) {
+                                clearInterval(printCheckInterval);
+                                executeMarkFilesAsPrinted();
+                            }
+                            }, 500);
 
                         // Function to execute markFilesAsPrinted after confirmation
                         function executeMarkFilesAsPrinted() {
                             var printSuccessful = confirm("Was the print successful?");
                             if (printSuccessful) {
                                 markFilesAsPrinted(id);
-                                location.reload();
+                                
                             }
                         }
 
                         // Delay the execution of executeMarkFilesAsPrinted
-                        setTimeout(executeMarkFilesAsPrinted, 500); // Adjust the delay time as needed
+                        // setTimeout(executeMarkFilesAsPrinted, 500); // Adjust the delay time as needed
                     })
                     .catch(error => {
                         console.error('There was a problem with fetching the file:', error);
@@ -195,7 +212,7 @@
                     if (experiments[i].hasOwnProperty(key)) {
                     // Check if the experiment belongs to the given studentId
                         if (experiments[i][key][0]) {
-                            const url = "https://miniprojectprintmanagement.pythonanywhere.com/" + `${experiments[i][key][1]}`;
+                            const url = "http://127.0.0.1:8000/" + `${experiments[i][key][1]}`;
                             filePromises.push(fetchFileContent(url));
                         }
                     }
@@ -203,26 +220,25 @@
                 Promise.all(filePromises)
                 .then(fileContents => {
                     var combinedContent = fileContents.join('\n\n');
-                    printContent(combinedContent);
-                    function executeMarkFilesAsPrinted() {
+                    printContent(combinedContent,experiments,i);
+
+                 
+                    // setTimeout(executeMarkFilesAsPrinted, 1000); // Adjust the delay time as needed                    
+                })
+                .catch(error => {
+                    console.error('There was a problem with fetching the file content:', error);
+                });
+            }
+            function executeMarkFilesAsPrinted(experiments,i) {
                             var printSuccessful = confirm("Was the print successful?");
                             if (printSuccessful) {
                                for (var key in experiments[i]) {
                                     if (experiments[i].hasOwnProperty(key)){
                                         markFilesAsPrinted(experiments[i][key][3]);
                                     }
-                               }
-                                location.reload();
+                                }
                             }
                     }
-                    setTimeout(executeMarkFilesAsPrinted, 1000); // Adjust the delay time as needed
-
-                    
-                })
-                .catch(error => {
-                    console.error('There was a problem with fetching the file content:', error);
-                });
-            }
             function fetchFileContent(url) {
                 return fetch(url)
                 .then(response => {
@@ -236,12 +252,46 @@
                     return ''; // Return empty string to avoid breaking Promise.all
                 });
             }
-            function printContent(content) {
+            function printContent(content,experiments,i) {
                 var printWindow = window.open('', '_blank');
                 printWindow.document.write('<pre>' + content + '</pre>');
                 printWindow.document.close();
                 printWindow.print();
+                var printCheckInterval = setInterval(function() {
+                            if (printWindow.closed) {
+                                clearInterval(printCheckInterval);
+                                executeMarkFilesAsPrinted(experiments,i);
+                            }
+                            }, 500);
             }
+    
+        function deletePrintedFiles() {
+            var deleteConfirmed = confirm("Are you sure you want to delete all printed files?\nThis action cannot be undone.");
+            if (deleteConfirmed) {
+                const csrftoken = getCookie('csrftoken');
+                const options = {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': csrftoken // Include the CSRF token in the request headers
+                        }
+                };
+
+                fetch('/users/delete_printed_files/', options)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            console.log('Files deleted successfully');
+                        })
+                        
+                        .catch(error => {
+                            console.error('Error deleting files ', error);
+                        });
+
+                location.reload();
+            }
+        }
 
        </script>
        
